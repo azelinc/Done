@@ -3,7 +3,7 @@ import { getAuth, createUserWithEmailAndPassword, signInWithEmailAndPassword, si
 import { getDatabase, ref, push, set, onValue, update, remove, child, get, off } from "https://www.gstatic.com/firebasejs/11.0.0/firebase-database.js";
 
 const CFG = {
-  apiKey: "AIzaSy...vmuo",
+  apiKey: "AIzaSyC2fezwrXSOeDCytG84RES-dJ04teLvmuo",
   authDomain: "ainvested-703ec.firebaseapp.com",
   projectId: "ainvested-703ec",
   databaseURL: "https://ainvested-703ec-default-rtdb.asia-southeast1.firebasedatabase.app",
