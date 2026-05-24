@@ -161,7 +161,8 @@ function toggleItem(it) {
   const list = loadItems().map(i => i.id === it.id ? { ...i, done: newDone } : i);
   saveItems(list);
   if (firebaseOK && uid) {
-    set(ref(db, 'users/' + uid + '/done/' + it.id), { name: it.name, cat: it.cat, done: newDone, createdAt: it.createdAt, by: uid })
+    const targetUid = it.by || uid;
+    set(ref(db, 'users/' + targetUid + '/done/' + it.id), { name: it.name, cat: it.cat, done: newDone, createdAt: it.createdAt, by: targetUid })
       .catch(e => console.error('Toggle sync failed:', e));
   }
 }
@@ -170,7 +171,8 @@ function deleteItem(it) {
   const list = loadItems().filter(i => i.id !== it.id);
   saveItems(list);
   if (firebaseOK && uid) {
-    remove(ref(db, 'users/' + uid + '/done/' + it.id))
+    const targetUid = it.by || uid;
+    remove(ref(db, 'users/' + targetUid + '/done/' + it.id))
       .catch(e => console.error('Delete sync failed:', e));
   }
 }
@@ -184,7 +186,7 @@ el('btn-clear').onclick = () => {
   const done = loadItems().filter(i => i.done);
   if (!done.length) { toast('Nothing to clear'); return; }
   if (firebaseOK) {
-    done.forEach(function(it) { try { remove(ref(db, 'users/' + uid + '/done/' + it.id)).catch(function(e){ console.error(e); }); } catch(e){} });
+    done.forEach(function(it) { try { remove(ref(db, 'users/' + (it.by || uid) + '/done/' + it.id)).catch(function(e){ console.error(e); }); } catch(e){} });
   }
   saveItems(loadItems().filter(i => !i.done));
   toast('Cleared ' + done.length);
