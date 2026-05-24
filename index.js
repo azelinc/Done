@@ -103,17 +103,31 @@ function renderCatChips(items) {
     const c = i.cat || 'Misc';
     if (!seen.has(c)) { seen.add(c); cats.push(c); }
   });
-  // Limit to ~8 chips
-  const shown = cats.slice(0, 8);
+  // Limit to ~7 chips + New button
+  const shown = cats.slice(0, 7);
 
   qCatChips.innerHTML = '';
   shown.forEach(c => {
     const b = document.createElement('button');
     b.className = 'chip' + (selectedCat === c ? ' active' : '');
     b.textContent = c;
-    b.onclick = () => { selectedCat = c; renderCatChips(items); };
+    b.onclick = () => { selectedCat = c; renderCatChips(items); hideNewCat(); };
     qCatChips.appendChild(b);
   });
+
+  // + New chip
+  const plus = document.createElement('button');
+  plus.className = 'chip';
+  plus.style.cssText = 'background:transparent;border-style:dashed';
+  plus.textContent = '+ New';
+  plus.onclick = () => {
+    const row = el('new-cat-row');
+    const inp = el('new-cat-input');
+    row.style.display = 'block';
+    inp.value = '';
+    inp.focus();
+  };
+  qCatChips.appendChild(plus);
 }
 
 function renderList(items) {
@@ -165,6 +179,15 @@ function renderList(items) {
 }
 
 // ── Item actions ──
+function hideNewCat() { el('new-cat-row').style.display = 'none'; el('new-cat-input').value = ''; }
+
+function setNewCategory() {
+  const v = el('new-cat-input').value.trim();
+  if (v) { selectedCat = v; }
+  hideNewCat();
+  rebuild();
+}
+
 function addItem() {
   const name = qItems.value.trim(); if (!name) { toast('Enter item name'); return; }
   const cat = selectedCat;
@@ -211,6 +234,9 @@ function deleteItem(it) {
 // ── Event bindings (main panel) ──
 qAdd.onclick = addItem;
 qItems.onkeydown = e => { if (e.key === 'Enter') addItem(); };
+
+el('btn-new-cat').onclick = setNewCategory;
+el('new-cat-input').onkeydown = e => { if (e.key === 'Enter') setNewCategory(); };
 
 el('btn-clear').onclick = () => {
   const done = loadItems().filter(i => i.done);
