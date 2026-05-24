@@ -404,13 +404,13 @@ qLoginPass.onkeydown = e => { if (e.key === 'Enter') qBtnLogin.click(); };
 function esc(t) { const d = document.createElement('div'); d.textContent = t; return d.innerHTML; }
 
 if (firebaseOK) {
-  var firstAuth = true;
-  // Safety timeout: if auth doesn't resolve in 5s, show login
-  var authTimer = setTimeout(function() {
-    if (firstAuth) { firstAuth = false; showLogin(); }
+  var resolved = false;
+  // Safety timeout: if auth callback never fires, show login after 5s
+  setTimeout(function() {
+    if (!resolved) { resolved = true; showLogin(); }
   }, 5000);
   onAuthStateChanged(auth, user => {
-    if (firstAuth) { firstAuth = false; clearTimeout(authTimer); if (!user) return; }
+    resolved = true;
     if (user) {
       showMain(user);
     } else {
