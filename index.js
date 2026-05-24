@@ -2,8 +2,8 @@ import { initializeApp } from "https://www.gstatic.com/firebasejs/11.0.0/firebas
 import { getAuth, signInAnonymously, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/11.0.0/firebase-auth.js";
 import { getDatabase, ref, push, onValue, update, remove, child, get, off } from "https://www.gstatic.com/firebasejs/11.0.0/firebase-database.js";
 
-const CFG = {
-  apiKey: "AIzaSy...vmuo",
+const appConfig = {
+  apiKey: "AIzaSyC2fezwrXSOeDCytG84RES-dJ04teLvmuo",
   authDomain: "ainvested-703ec.firebaseapp.com",
   projectId: "ainvested-703ec",
   databaseURL: "https://ainvested-703ec-default-rtdb.asia-southeast1.firebasedatabase.app",
@@ -13,7 +13,7 @@ const CFG = {
 let app, auth, db = null;
 let firebaseOK = false;
 try {
-  app = initializeApp(CFG);
+  app = initializeApp(appConfig);
   auth = getAuth(app);
   db  = getDatabase(app);
   firebaseOK = true;
