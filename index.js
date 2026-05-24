@@ -202,9 +202,13 @@ function updateHeader() {
   if (partnerUid) {
     qLinkedTo.textContent = 'Linked to: ' + partnerUid.slice(0, 12) + '...';
     qUnlink.style.display = '';
+    qLinkBtn.textContent = '👥';
+    qLinkBtn.title = 'Linked — click to manage';
   } else {
     qLinkedTo.textContent = 'Not linked';
     qUnlink.style.display = 'none';
+    qLinkBtn.textContent = '⚙';
+    qLinkBtn.title = 'Link Partner';
   }
 }
 // Copy UID
