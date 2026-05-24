@@ -115,18 +115,19 @@ function renderList(items){
 function addItem(){
   const name=qItems.value.trim(); if(!name){ toast('Enter item name'); return; }
   const cat=(qCat.value.trim()||'Misc');
-  if(firebaseOK){
+  if(firebaseOK && uid){
     const r=push(pathFor(uid));
     update(r,{name,cat,done:false,createdAt:Date.now(),by:uid});
   } else {
     const list=loadLocalRaw();
     const id='off_'+Date.now()+Math.random().toString(36).slice(2,6);
     list.push({id,name,cat,done:false,createdAt:Date.now(),by:getOfflineUid()});
-    saveLocal(list);
+    saveLocal(list); loadLocal(); rebuild();
   }
   qItems.value=''; qCat.value=''; qItems.focus(); toast('Added');
 }
 qAdd.onclick=addItem; qItems.onkeydown=e=>{ if(e.key==='Enter') addItem(); };
+qCat.onkeydown=e=>{ if(e.key==='Enter') addItem(); };
 
 function toggleItem(it){
   if(firebaseOK){ const target=ref(db,`dones/${it.by}/${it.id}`); update(target,{done:!it.done}); }
