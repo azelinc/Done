@@ -1,5 +1,5 @@
 import { initializeApp } from "https://www.gstatic.com/firebasejs/11.0.0/firebase-app.js";
-import { getAuth, createUserWithEmailAndPassword, signInWithEmailAndPassword, signOut, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/11.0.0/firebase-auth.js";
+import { getAuth, createUserWithEmailAndPassword, signInWithEmailAndPassword, signOut, onAuthStateChanged, authStateReady } from "https://www.gstatic.com/firebasejs/11.0.0/firebase-auth.js";
 import { getDatabase, ref, push, set, onValue, update, remove, child, get, off } from "https://www.gstatic.com/firebasejs/11.0.0/firebase-database.js";
 
 const CFG = {
@@ -405,7 +405,7 @@ function esc(t) { const d = document.createElement('div'); d.textContent = t; re
 
 if (firebaseOK) {
   // Wait until Firebase resolves persisted auth state (no login flash)
-  auth.authStateReady().then(() => {
+  authStateReady(auth).then(() => {
     const user = auth.currentUser;
     if (user) {
       showMain(user);

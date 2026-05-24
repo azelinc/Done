@@ -1,4 +1,4 @@
-const CACHE = 'done-v15';
+const CACHE = 'done-v16';
 const ASSETS = [
   './',
   './index.html',
