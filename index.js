@@ -247,7 +247,6 @@ qUnlink.onclick = () => {
 
 qLogout.onclick = () => {
   storeUid('');
-  storePartner('');
   signOut(auth).catch(() => {});
 };
 
