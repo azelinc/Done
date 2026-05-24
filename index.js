@@ -404,17 +404,13 @@ qLoginPass.onkeydown = e => { if (e.key === 'Enter') qBtnLogin.click(); };
 function esc(t) { const d = document.createElement('div'); d.textContent = t; return d.innerHTML; }
 
 if (firebaseOK) {
-  // Wait until Firebase resolves persisted auth state (no login flash)
-  authStateReady(auth).then(() => {
-    const user = auth.currentUser;
-    if (user) {
-      showMain(user);
-    } else {
-      showLogin();
-    }
-  });
-  // Listen for future auth changes (login/logout)
+  var firstAuth = true;
+  // Safety timeout: if auth doesn't resolve in 5s, show login
+  var authTimer = setTimeout(function() {
+    if (firstAuth) { firstAuth = false; showLogin(); }
+  }, 5000);
   onAuthStateChanged(auth, user => {
+    if (firstAuth) { firstAuth = false; clearTimeout(authTimer); if (!user) return; }
     if (user) {
       showMain(user);
     } else {
