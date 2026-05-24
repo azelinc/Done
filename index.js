@@ -32,15 +32,15 @@ const qBtnLogin = el('btn-login'), qBtnSignup = el('btn-signup');
 const qLoginPanel = el('login-panel');
 // main panel
 const qMainPanel = el('main-panel'), qUserDisp = el('user-email-display');
-const qItems = el('new-item'), qCat = el('new-cat'), qAdd = el('btn-add');
+const qItems = el('new-item'), qAdd = el('btn-add');
 const qList  = el('list-card'),  qTotal = el('total-items'), qDone = el('done-items');
-const qChips = el('chip-group');
+const qCatChips = el('cat-chips');
 const qLinkPanel = el('link-panel'), qLinkInput = el('link-input'), qLinkAction = el('btn-link-action');
 const qLinkedTo = el('linked-to'), qUidDisplay = el('uid-display'), qUnlink = el('btn-unlink');
 const qLogout  = el('btn-logout'),  qLinkBtn = el('btn-link');
 
 // ── State ──
-let uid = '', partnerUid = '', itemsKey = 'done_items', listeners = [], activeCat = 'All';
+let uid = '', partnerUid = '', itemsKey = 'done_items', listeners = [], selectedCat = 'Misc';
 
 function storeUid(u) { uid = u; try { localStorage.setItem('done_uid', u); } catch(e){} }
 function storePartner(u) { partnerUid = (u || ''); try { localStorage.setItem('done_partner', partnerUid); } catch(e){} }
@@ -85,25 +85,34 @@ function rebuild() {
   all.forEach(i => { map.set(i.by + '::' + i.id, i); });
   const uniq = Array.from(map.values());
 
-  const cats = new Set(uniq.map(i => i.cat));
-  cats.add('All');
-  renderChips(Array.from(cats));
-
-  const filtered = activeCat === 'All' ? uniq : uniq.filter(i => i.cat === activeCat);
-  renderList(filtered);
+  renderCatChips(uniq);
+  renderList(uniq);
   qTotal.textContent = uniq.length;
   qDone.textContent = uniq.filter(i => i.done).length;
 }
 
-function renderChips(cats) {
-  qChips.innerHTML = '';
-  cats.forEach(c => {
+function renderCatChips(items) {
+  // Collect unique categories, sorted by recency (most recent item first)
+  const seen = new Set();
+  const cats = [];
+  // Always offer Misc
+  seen.add('Misc'); cats.push('Misc');
+  // Then recently used categories (most recent first)
+  const sorted = [...items].sort((a,b) => (b.createdAt||0) - (a.createdAt||0));
+  sorted.forEach(i => {
+    const c = i.cat || 'Misc';
+    if (!seen.has(c)) { seen.add(c); cats.push(c); }
+  });
+  // Limit to ~8 chips
+  const shown = cats.slice(0, 8);
+
+  qCatChips.innerHTML = '';
+  shown.forEach(c => {
     const b = document.createElement('button');
-    b.className = 'chip' + (activeCat === c ? ' active' : '');
-    const count = c === 'All' ? loadItems().length : loadItems().filter(i => i.cat === c).length;
-    b.innerHTML = esc(c) + '<span class="chip-badge">' + count + '</span>';
-    b.onclick = () => { activeCat = c; rebuild(); };
-    qChips.appendChild(b);
+    b.className = 'chip' + (selectedCat === c ? ' active' : '');
+    b.textContent = c;
+    b.onclick = () => { selectedCat = c; renderCatChips(items); };
+    qCatChips.appendChild(b);
   });
 }
 
@@ -158,7 +167,7 @@ function renderList(items) {
 // ── Item actions ──
 function addItem() {
   const name = qItems.value.trim(); if (!name) { toast('Enter item name'); return; }
-  const cat = (qCat.value.trim() || 'Misc');
+  const cat = selectedCat;
   const ts = Date.now();
 
   // Generate Firebase key first (syncs local + remote IDs)
@@ -175,7 +184,7 @@ function addItem() {
       .catch(e => console.error('Push failed:', e));
   }
   toast('Added');
-  qItems.value = ''; qCat.value = ''; qItems.focus();
+  qItems.value = ''; qItems.focus();
 }
 
 function toggleItem(it) {
@@ -202,7 +211,6 @@ function deleteItem(it) {
 // ── Event bindings (main panel) ──
 qAdd.onclick = addItem;
 qItems.onkeydown = e => { if (e.key === 'Enter') addItem(); };
-qCat.onkeydown = e => { if (e.key === 'Enter') addItem(); };
 
 el('btn-clear').onclick = () => {
   const done = loadItems().filter(i => i.done);
