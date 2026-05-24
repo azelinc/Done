@@ -179,12 +179,25 @@ function saveLocal(arr){ try{ localStorage.setItem(itemsKey, JSON.stringify(arr)
 if(firebaseOK){
   restorePartner(); partnerUid = restorePartner();
   onAuthStateChanged(auth, user=>{
-    if(user){ storeUid(user.uid); startListening(); }
+    if(user){ storeUid(user.uid); migrateLocalItems(); startListening(); }
     else {
-      signInAnonymously(auth).then(cred=>{ storeUid(cred.user.uid); startListening(); })
+      signInAnonymously(auth).then(cred=>{ storeUid(cred.user.uid); migrateLocalItems(); startListening(); })
       .catch(err=>{ console.error(err); toast('Auth failed — offline mode'); firebaseOK=false; startListening(); });
     }
   });
 } else {
   startListening();
+}
+
+function migrateLocalItems(){
+  if(!firebaseOK || !uid) return;
+  const list = loadLocalRaw();
+  if(!list.length) return;
+  const updates = {};
+  list.forEach(it=>{
+    const key = push(ref(db,`dones/${uid}`)).key;
+    updates['dones/'+uid+'/'+key] = {name:it.name, cat:it.cat||'Misc', done:!!it.done, createdAt:it.createdAt||Date.now(), by:uid};
+  });
+  update(ref(db), updates).then(()=>{ localStorage.removeItem(itemsKey); console.log('Migrated',list.length,'items'); })
+  .catch(e=>console.error('Migrate failed',e));
 }
