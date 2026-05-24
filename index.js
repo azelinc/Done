@@ -43,8 +43,34 @@ const qLogout  = el('btn-logout'),  qLinkBtn = el('btn-link');
 let uid = '', partnerUid = '', itemsKey = 'done_items', listeners = [], selectedCat = 'Misc';
 
 function storeUid(u) { uid = u; try { localStorage.setItem('done_uid', u); } catch(e){} }
-function storePartner(u) { partnerUid = (u || ''); try { localStorage.setItem('done_partner', partnerUid); } catch(e){} }
-function restorePartner() { partnerUid = localStorage.getItem('done_partner') || ''; return partnerUid; }
+function storePartner(u) {
+  partnerUid = (u || '');
+  try { localStorage.setItem('done_partner', partnerUid); } catch(e){}
+  // Persist to RTDB so link survives across devices
+  if (firebaseOK && uid) {
+    if (partnerUid) {
+      set(ref(db, 'users/' + uid + '/partner'), partnerUid).catch(function(){});
+    } else {
+      remove(ref(db, 'users/' + uid + '/partner')).catch(function(){});
+    }
+  }
+}
+function restorePartner(cb) {
+  // Try localStorage first for instant load
+  partnerUid = localStorage.getItem('done_partner') || '';
+  if (partnerUid) { if (cb) cb(); return; }
+  // Then check RTDB for cross-device persistence
+  if (firebaseOK && uid) {
+    get(child(ref(db), 'users/' + uid + '/partner')).then(function(snap) {
+      if (snap.exists()) {
+        partnerUid = snap.val();
+        try { localStorage.setItem('done_partner', partnerUid); } catch(e){}
+        if (cb) cb();
+        updateHeader();
+      }
+    }).catch(function(){});
+  }
+}
 
 restorePartner();
 
@@ -323,10 +349,11 @@ function showMain(user) {
   uid = user.uid;
   storeUid(uid);
   qUserDisp.textContent = '— ' + (user.email || uid.slice(0, 8));
-  restorePartner();
-  startListening();
-  rebuild();
-  updateHeader();
+  restorePartner(function() {
+    startListening();
+    rebuild();
+    updateHeader();
+  });
   // Store email UID mapping for partner lookup
   if (firebaseOK && user.email) {
     var es = user.email.replace(/\./g, ',');
