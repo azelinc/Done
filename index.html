@@ -9,8 +9,7 @@
 <style>
   :root{
     --bg:#0f172a;--card:#0f172a;--surface:#1e293b;--border:#334155;
-    --txt:#e2e8f0;--muted:#94a3b8;--live:#06b6d4;--good:#22c55e;--bad:#ef4444;
-    --accent:#22c55e;--accent2:#3b82f6;--row:#141c2e;
+    --txt:#e2e8f0;--muted:#94a3b8;--accent:#22c55e;--bad:#ef4444;--row:#141c2e;
   }
   *,*::before,*::after{box-sizing:border-box}
   html,body{height:100%;margin:0;background:var(--bg);color:var(--txt);font-family:system-ui,-apple-system,sans-serif}
@@ -26,11 +25,11 @@
 
   .card{background:var(--row);border:1px solid var(--border);border-radius:14px;padding:14px;margin:12px 0}
   .input{display:flex;gap:8px;flex-wrap:wrap}
-  input[type="text"],input[type="number"],select{background:var(--surface);border:1px solid var(--border);color:var(--txt);padding:10px 12px;border-radius:10px;font-size:15px;flex:1 1 160px;min-width:0}
+  input[type="text"],input[type="email"],input[type="password"],select{background:var(--surface);border:1px solid var(--border);color:var(--txt);padding:10px 12px;border-radius:10px;font-size:15px;flex:1 1 160px;min-width:0}
   .row{display:flex;align-items:center;gap:10px;padding:10px;border-bottom:1px solid rgba(255,255,255,.04)}
   .row:last-child{border-bottom:none}
   .check{width:22px;height:22px;border-radius:50%;cursor:pointer;border:2px solid var(--border);display:flex;align-items:center;justify-content:center;background:transparent;flex-shrink:0}
-  .check.on{background:var(--good);border-color:var(--good)}
+  .check.on{background:var(--accent);border-color:var(--accent)}
   .name{flex:1;word-break:break-word}
   .name.done{text-decoration:line-through;color:var(--muted)}
   .meta{font-size:12px;color:var(--muted);min-width:70px;text-align:right;white-space:nowrap}
@@ -39,43 +38,65 @@
   .chip{border:1px solid var(--border);background:var(--surface);color:var(--txt);padding:6px 10px;border-radius:999px;font-size:13px;cursor:pointer}
   .chip.active{background:linear-gradient(135deg,var(--accent),#16a34a);border:none;color:#fff}
   .chip-badge{background:var(--bg);color:var(--txt);padding:1px 6px;border-radius:10px;font-size:12px;margin-left:5px}
-  .actions{display:flex;gap:8px;justify-content:flex-end}
   .link-row{display:flex;gap:10px;align-items:center;flex-wrap:wrap;margin-top:8px}
   .link-row input{flex:1}
   .footer{text-align:center;padding:18px;color:var(--muted);font-size:12px}
   .hidden{display:none!important}
   .toast{position:fixed;bottom:16px;left:50%;transform:translateX(-50%);background:var(--surface);border:1px solid var(--border);color:var(--txt);padding:10px 16px;border-radius:12px;z-index:50;font-size:13px;opacity:0;transition:opacity .6s}
   .show{opacity:1}
+  .login-form{display:flex;flex-direction:column;gap:10px}
+  .login-form input{width:100%;background:var(--surface);border:1px solid var(--border);color:var(--txt);padding:10px 12px;border-radius:10px;font-size:15px}
+  .login-actions{display:flex;gap:10px}
+  .login-actions .btn{flex:1}
+  .error{color:var(--bad);font-size:13px;margin-top:4px}
 </style>
 </head>
 <body>
-<div class="app">
+
+<!-- LOGIN PANEL -->
+<div class="app" id="login-panel">
+  <h1>Done</h1>
+  <div class="small" style="margin-bottom:12px">Shared shopping lists, synced across devices</div>
+  <div class="card">
+    <div class="login-form">
+      <input type="email" id="login-email" placeholder="Email address" autocomplete="email">
+      <input type="password" id="login-password" placeholder="Password (6+ chars)" autocomplete="current-password">
+      <div class="error" id="login-error"></div>
+      <div class="login-actions">
+        <button class="btn btn-primary" id="btn-login">Sign In</button>
+        <button class="btn btn-ghost" id="btn-signup">Create Account</button>
+      </div>
+    </div>
+  </div>
+  <div class="footer">Sign in to sync; link a partner to share lists</div>
+</div>
+
+<!-- MAIN APP (hidden until authenticated) -->
+<div class="app hidden" id="main-panel">
   <header>
-    <h1 id="title">Done <span class="small">— Shared List</span></h1>
+    <h1>Done <span class="small" id="user-email-display"></span></h1>
     <div style="display:flex;gap:8px;">
-      <button class="btn btn-ghost" id="btn-link">Link</button>
-      <button class="btn btn-ghost" id="btn-settings">&#9881;</button>
+      <button class="btn btn-ghost" id="btn-link">Link Partner</button>
+      <button class="btn btn-ghost" id="btn-logout">Logout</button>
     </div>
   </header>
 
   <div class="card" id="link-panel" style="display:none">
-    <div id="link-info">
-      <div class="small">Your ID: <b id="uid-display">...</b></div>
-      <div class="link-row">
-        <input type="text" id="link-input" placeholder="Paste partner's UID to link">
-        <button class="btn btn-primary" id="btn-link-action">Link</button>
-      </div>
-      <div class="link-row">
-        <button class="btn btn-ghost" id="btn-unlink">Unlink</button>
-      </div>
-      <div id="linked-to" class="small" style="margin-top:6px"></div>
+    <div class="small">Your ID: <b id="uid-display">...</b></div>
+    <div class="link-row">
+      <input type="text" id="link-input" placeholder="Paste partner's UID to link">
+      <button class="btn btn-primary" id="btn-link-action">Link</button>
     </div>
+    <div class="link-row">
+      <button class="btn btn-ghost" id="btn-unlink">Unlink</button>
+    </div>
+    <div id="linked-to" class="small" style="margin-top:6px"></div>
   </div>
 
   <div class="card">
     <div class="input">
       <input type="text" id="new-item" placeholder="Add item (e.g. Milk)">
-      <input type="text" id="new-cat" placeholder="Category (default: Misc)" style="max-width:140px">
+      <input type="text" id="new-cat" placeholder="Category" style="max-width:140px">
       <button class="btn btn-primary" id="btn-add">Add</button>
     </div>
     <div class="chip-group" id="chip-group"></div>
@@ -92,6 +113,7 @@
 
   <div class="footer">Press Enter to add — click circle to toggle</div>
 </div>
+
 <div id="toast" class="toast"></div>
 
 <script type="module" src="index.js"></script>
