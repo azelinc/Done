@@ -25,9 +25,15 @@
 
   .card{background:var(--row);border:1px solid var(--border);border-radius:14px;padding:14px;margin:12px 0}
   .input{display:flex;gap:8px;flex-wrap:wrap}
+  @media(min-width:420px){.input{flex-wrap:nowrap}}
   input[type="text"],input[type="email"],input[type="password"],select{background:var(--surface);border:1px solid var(--border);color:var(--txt);padding:10px 12px;border-radius:10px;font-size:15px;flex:1 1 160px;min-width:0}
-  .row{display:flex;align-items:center;gap:10px;padding:10px;border-bottom:1px solid rgba(255,255,255,.04)}
+  #btn-add{flex-shrink:0;white-space:nowrap}
+  .row{display:flex;align-items:center;gap:10px;padding:10px;border-bottom:1px solid rgba(255,255,255,.04);border-left:3px solid transparent}
   .row:last-child{border-bottom:none}
+  .row.mine{border-left-color:var(--accent)}
+  .row.partner{border-left-color:#60a5fa}
+  .section-hdr{font-size:11px;font-weight:600;color:var(--muted);text-transform:uppercase;letter-spacing:.5px;padding:8px 0 4px 0;border-bottom:1px solid rgba(255,255,255,.06);margin-top:4px}
+  .section-hdr:first-child{margin-top:0}
   .check{width:22px;height:22px;border-radius:50%;cursor:pointer;border:2px solid var(--border);display:flex;align-items:center;justify-content:center;background:transparent;flex-shrink:0}
   .check.on{background:var(--accent);border-color:var(--accent)}
   .name{flex:1;word-break:break-word}

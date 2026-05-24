@@ -3,7 +3,7 @@ import { getAuth, createUserWithEmailAndPassword, signInWithEmailAndPassword, si
 import { getDatabase, ref, push, set, onValue, update, remove, child, get, off } from "https://www.gstatic.com/firebasejs/11.0.0/firebase-database.js";
 
 const CFG = {
-  apiKey: "AIzaSyC2fezwrXSOeDCytG84RES-dJ04teLvmuo",
+  apiKey: "AIzaSy...vmuo",
   authDomain: "ainvested-703ec.firebaseapp.com",
   projectId: "ainvested-703ec",
   databaseURL: "https://ainvested-703ec-default-rtdb.asia-southeast1.firebasedatabase.app",
@@ -90,10 +90,6 @@ function rebuild() {
   renderChips(Array.from(cats));
 
   const filtered = activeCat === 'All' ? uniq : uniq.filter(i => i.cat === activeCat);
-  filtered.sort((a, b) => {
-    if (a.done !== b.done) return a.done ? 1 : -1;
-    return (b.createdAt || 0) - (a.createdAt || 0);
-  });
   renderList(filtered);
   qTotal.textContent = uniq.length;
   qDone.textContent = uniq.filter(i => i.done).length;
@@ -117,19 +113,45 @@ function renderList(items) {
     return;
   }
   qList.innerHTML = '';
+
+  // Group by category
+  const groups = {};
   items.forEach(it => {
-    const row = document.createElement('div'); row.className = 'row';
-    const circ = document.createElement('div'); circ.className = 'check' + (it.done ? ' on' : ''); circ.innerHTML = '&#10003;';
-    circ.onclick = () => toggleItem(it);
-    const name = document.createElement('div'); name.className = 'name' + (it.done ? ' done' : ''); name.textContent = it.name;
-    const meta = document.createElement('div'); meta.className = 'meta'; meta.textContent = (it.by && it.by !== uid) ? 'partner' : 'mine';
-    const cat = document.createElement('span'); cat.className = 'tag'; cat.textContent = it.cat || 'Misc';
-    const del = document.createElement('button'); del.className = 'btn btn-danger'; del.style.cssText = 'padding:4px 8px;border-radius:8px;font-size:12px'; del.textContent = 'Del';
-    del.onclick = () => deleteItem(it);
-    const act = document.createElement('div'); act.style.cssText = 'display:flex;gap:6px;align-items:center';
-    act.appendChild(meta); act.appendChild(cat); act.appendChild(del);
-    row.appendChild(circ); row.appendChild(name); row.appendChild(act);
-    qList.appendChild(row);
+    const cat = it.cat || 'Misc';
+    if (!groups[cat]) groups[cat] = [];
+    groups[cat].push(it);
+  });
+
+  // Sort categories alphabetically, Misc last
+  const sortedCats = Object.keys(groups).sort((a,b) => a.toLowerCase().localeCompare(b.toLowerCase()));
+  const miscIdx = sortedCats.indexOf('Misc');
+  if (miscIdx > -1) { sortedCats.splice(miscIdx, 1); sortedCats.push('Misc'); }
+
+  sortedCats.forEach(cat => {
+    // Section header
+    const hdr = document.createElement('div');
+    hdr.className = 'section-hdr';
+    hdr.textContent = cat + ' (' + groups[cat].length + ')';
+    qList.appendChild(hdr);
+
+    // Sort within category: undone first, then newest first
+    groups[cat].sort((a,b) => {
+      if (a.done !== b.done) return a.done ? 1 : -1;
+      return (b.createdAt || 0) - (a.createdAt || 0);
+    });
+
+    groups[cat].forEach(it => {
+      const isMine = !it.by || it.by === uid;
+      const row = document.createElement('div');
+      row.className = 'row ' + (isMine ? 'mine' : 'partner');
+      const circ = document.createElement('div'); circ.className = 'check' + (it.done ? ' on' : ''); circ.innerHTML = '&#10003;';
+      circ.onclick = () => toggleItem(it);
+      const name = document.createElement('div'); name.className = 'name' + (it.done ? ' done' : ''); name.textContent = it.name;
+      const del = document.createElement('button'); del.className = 'btn btn-danger'; del.style.cssText = 'padding:4px 8px;border-radius:8px;font-size:12px;flex-shrink:0'; del.textContent = 'Del';
+      del.onclick = (e) => { e.stopPropagation(); deleteItem(it); };
+      row.appendChild(circ); row.appendChild(name); row.appendChild(del);
+      qList.appendChild(row);
+    });
   });
 }
 
@@ -329,4 +351,3 @@ if (firebaseOK) {
   showLogin();
   qLoginPanel.innerHTML = '<h1>Done</h1><div class="card">Cloud sync unavailable. Refresh to retry.</div>';
 }
-
