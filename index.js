@@ -186,27 +186,47 @@ qLinkBtn.onclick = () => {
 };
 
 function updateHeader() {
-  qUidDisplay.textContent = uid ? uid.slice(0, 8) + '...' : '...';
+  qUidDisplay.textContent = uid || '...';
   if (partnerUid) {
-    qLinkedTo.textContent = 'Linked to: ' + partnerUid.slice(0, 8) + '...';
+    qLinkedTo.textContent = 'Linked to: ' + partnerUid.slice(0, 12) + '...';
     qUnlink.style.display = '';
   } else {
     qLinkedTo.textContent = 'Not linked';
     qUnlink.style.display = 'none';
   }
 }
+// Copy UID
+el('btn-copy-uid').onclick = () => {
+  if (!uid) return;
+  navigator.clipboard.writeText(uid).then(() => toast('UID copied'))
+    .catch(() => toast('Tap and select to copy manually'));
+};
 
 qLinkAction.onclick = () => {
-  const p = (qLinkInput.value || '').trim();
-  if (!p) { toast('Paste a UID'); return; }
+  var raw = (qLinkInput.value || '').trim();
+  if (!raw) { toast('Enter email or UID'); return; }
   if (!firebaseOK) { toast('Cloud sync not available'); return; }
-  if (p === uid) { toast('Cannot link to yourself'); return; }
-  get(child(ref(db), `users/${p}/done`)).then(snap => {
-    if (!snap.exists()) { toast('No account found'); return; }
-    storePartner(p);
+
+  function doLink(partnerId) {
+    if (partnerId === uid) { toast('Cannot link to yourself'); return; }
+    storePartner(partnerId);
     startListening();
+    qLinkInput.value = '';
     toast('Linked!');
-  }).catch(err => toast('Link failed: ' + (err.message || '')));
+  }
+
+  if (raw.indexOf('@') !== -1) {
+    var sanitized = raw.replace(/\./g, ',');
+    get(child(ref(db), 'users/emails/' + sanitized)).then(function(snap) {
+      if (!snap.exists()) { toast('Email not found. Ask partner to log in first.'); return; }
+      doLink(snap.val());
+    }).catch(function(err) { toast('Lookup failed: ' + (err.message || '')); });
+  } else {
+    get(child(ref(db), 'users/' + raw + '/done')).then(function(snap) {
+      if (!snap.exists()) { toast('No account found with that UID'); return; }
+      doLink(raw);
+    }).catch(function(err) { toast('Link failed: ' + (err.message || '')); });
+  }
 };
 
 qUnlink.onclick = () => {
@@ -236,6 +256,11 @@ function showMain(user) {
   startListening();
   rebuild();
   updateHeader();
+  // Store email UID mapping for partner lookup
+  if (firebaseOK && user.email) {
+    var es = user.email.replace(/\./g, ',');
+    set(ref(db, 'users/emails/' + es), uid).catch(function(){});
+  }
 }
 
 function authError(e) {
