@@ -404,13 +404,8 @@ qLoginPass.onkeydown = e => { if (e.key === 'Enter') qBtnLogin.click(); };
 function esc(t) { const d = document.createElement('div'); d.textContent = t; return d.innerHTML; }
 
 if (firebaseOK) {
-  var resolved = false;
-  // Safety timeout: if auth callback never fires, show login after 5s
-  setTimeout(function() {
-    if (!resolved) { resolved = true; showLogin(); }
-  }, 5000);
   onAuthStateChanged(auth, user => {
-    resolved = true;
+    qLoading.classList.add('hidden');
     if (user) {
       showMain(user);
     } else {
@@ -418,7 +413,6 @@ if (firebaseOK) {
     }
   });
 } else {
-  // No Firebase: just show the app in offline mode
   showLogin();
   qLoginPanel.innerHTML = '<h1>Done</h1><div class="card">Cloud sync unavailable. Refresh to retry.</div>';
 }
