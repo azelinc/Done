@@ -55,12 +55,22 @@
   .login-actions{display:flex;gap:8px}
   .login-actions .btn{flex:1;font-size:14px;padding:8px}
   .error{color:var(--bad);font-size:13px;margin-top:4px}
+  .spinner{width:32px;height:32px;border:4px solid var(--border);border-top-color:var(--accent);border-radius:50%;animation:spin .7s linear infinite;margin:20px auto}
+  @keyframes spin{to{transform:rotate(360deg)}}
 </style>
 </head>
 <body>
 
+<!-- LOADING (shown until auth resolves) -->
+<div class="app" id="loading-panel" style="max-width:300px;margin:40px auto;text-align:center">
+  <h1 style="margin-bottom:2px;font-size:22px">Done</h1>
+  <div class="small" style="margin-bottom:16px">Shared shopping lists</div>
+  <div class="spinner"></div>
+  <div class="small" style="margin-top:10px">Checking login…</div>
+</div>
+
 <!-- LOGIN PANEL -->
-<div class="app" id="login-panel" style="max-width:300px;margin:24px auto;text-align:center">
+<div class="app hidden" id="login-panel" style="max-width:300px;margin:24px auto;text-align:center">
   <h1 style="margin-bottom:2px;font-size:22px">Done</h1>
   <div class="small" style="margin-bottom:16px">Shared shopping lists, synced across devices</div>
   <div class="card">
