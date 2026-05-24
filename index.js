@@ -137,32 +137,42 @@ function renderList(items) {
 function addItem() {
   const name = qItems.value.trim(); if (!name) { toast('Enter item name'); return; }
   const cat = (qCat.value.trim() || 'Misc');
-  const item = { id: '_' + Date.now() + Math.random().toString(36).slice(2, 6), name, cat, done: false, createdAt: Date.now(), by: uid };
+  const ts = Date.now();
+
+  // Generate Firebase key first (syncs local + remote IDs)
+  const r = firebaseOK ? push(pathFor(uid)) : null;
+  const id = r ? r.key : ('_' + ts + Math.random().toString(36).slice(2, 6));
+  const item = { id: id, name, cat, done: false, createdAt: ts, by: uid };
+
   const list = loadItems();
   list.push(item);
-  saveItems(list);   // also calls rebuild()
-  if (firebaseOK && uid) {
-    const r = push(pathFor(uid));
-    update(r, { name, cat, done: false, createdAt: Date.now(), by: uid });
+  saveItems(list);
+
+  if (r) {
+    set(r, { name, cat, done: false, createdAt: ts, by: uid })
+      .catch(e => console.error('Push failed:', e));
   }
   toast('Added');
   qItems.value = ''; qCat.value = ''; qItems.focus();
 }
 
 function toggleItem(it) {
-  if (firebaseOK && it.by === uid) {
-    update(ref(db, `dones/${it.by}/${it.id}`), { done: !it.done });
-  }
-  const list = loadItems().map(i => i.id === it.id ? { ...i, done: !i.done } : i);
+  const newDone = !it.done;
+  const list = loadItems().map(i => i.id === it.id ? { ...i, done: newDone } : i);
   saveItems(list);
+  if (firebaseOK && uid) {
+    set(ref(db, 'users/' + uid + '/done/' + it.id), { name: it.name, cat: it.cat, done: newDone, createdAt: it.createdAt, by: uid })
+      .catch(e => console.error('Toggle sync failed:', e));
+  }
 }
 
 function deleteItem(it) {
-  if (firebaseOK && it.by === uid) {
-    remove(ref(db, `users/${it.by}/done/${it.id}`));
-  }
   const list = loadItems().filter(i => i.id !== it.id);
   saveItems(list);
+  if (firebaseOK && uid) {
+    remove(ref(db, 'users/' + uid + '/done/' + it.id))
+      .catch(e => console.error('Delete sync failed:', e));
+  }
 }
 
 // ── Event bindings (main panel) ──
@@ -174,7 +184,7 @@ el('btn-clear').onclick = () => {
   const done = loadItems().filter(i => i.done);
   if (!done.length) { toast('Nothing to clear'); return; }
   if (firebaseOK) {
-    done.forEach(it => { try { remove(ref(db, `users/${uid}/done/${it.id}`)).catch(e => console.error(e)); } catch(e){} });
+    done.forEach(function(it) { try { remove(ref(db, 'users/' + uid + '/done/' + it.id)).catch(function(e){ console.error(e); }); } catch(e){} });
   }
   saveItems(loadItems().filter(i => !i.done));
   toast('Cleared ' + done.length);
