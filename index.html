@@ -44,18 +44,18 @@
   .hidden{display:none!important}
   .toast{position:fixed;bottom:16px;left:50%;transform:translateX(-50%);background:var(--surface);border:1px solid var(--border);color:var(--txt);padding:10px 16px;border-radius:12px;z-index:50;font-size:13px;opacity:0;transition:opacity .6s}
   .show{opacity:1}
-  .login-form{display:flex;flex-direction:column;gap:10px}
-  .login-form input{width:100%;background:var(--surface);border:1px solid var(--border);color:var(--txt);padding:10px 12px;border-radius:10px;font-size:15px}
-  .login-actions{display:flex;gap:10px}
-  .login-actions .btn{flex:1}
+  .login-form{display:flex;flex-direction:column;gap:8px}
+  .login-form input{width:100%;background:var(--surface);border:1px solid var(--border);color:var(--txt);padding:8px 10px;border-radius:8px;font-size:14px}
+  .login-actions{display:flex;gap:8px}
+  .login-actions .btn{flex:1;font-size:14px;padding:8px}
   .error{color:var(--bad);font-size:13px;margin-top:4px}
 </style>
 </head>
 <body>
 
 <!-- LOGIN PANEL -->
-<div class="app" id="login-panel" style="max-width:360px;margin:40px auto;text-align:center">
-  <h1 style="margin-bottom:4px">Done</h1>
+<div class="app" id="login-panel" style="max-width:300px;margin:24px auto;text-align:center">
+  <h1 style="margin-bottom:2px;font-size:22px">Done</h1>
   <div class="small" style="margin-bottom:16px">Shared shopping lists, synced across devices</div>
   <div class="card">
     <div class="login-form">
