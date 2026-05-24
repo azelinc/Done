@@ -3,7 +3,7 @@
      3|     3|import { getDatabase, ref, push, set, onValue, update, remove, child, get, off } from "https://www.gstatic.com/firebasejs/11.0.0/firebase-database.js";
      4|     4|
      5|     5|const CFG = {
-     6|     6|  apiKey: "AIzaSy...vmuo",
+     6|     6|  apiKey: "AIzaSyC2fezwrXSOeDCytG84RES-dJ04teLvmuo",
      7|     7|  authDomain: "ainvested-703ec.firebaseapp.com",
      8|     8|  projectId: "ainvested-703ec",
      9|     9|  databaseURL: "https://ainvested-703ec-default-rtdb.asia-southeast1.firebasedatabase.app",
