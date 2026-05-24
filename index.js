@@ -339,6 +339,10 @@ qLogout.onclick = () => {
 };
 
 // ── Auth handlers ──
+function showLogin() {
+  qLoginPanel.classList.remove('hidden');
+  qMainPanel.classList.add('hidden');
+}
 function showMain(user) {
   qLoginPanel.classList.add('hidden');
   qMainPanel.classList.remove('hidden');
@@ -399,8 +403,9 @@ if (firebaseOK) {
   onAuthStateChanged(auth, user => {
     if (user) {
       showMain(user);
+    } else {
+      showLogin();
     }
-    // else: login panel already visible, user signs in
   });
 } else {
   qLoginPanel.innerHTML = '<h1>Done</h1><div class="card">Cloud sync unavailable. Refresh to retry.</div>';
