@@ -1,0 +1,16 @@
+{
+  "short_name": "Done",
+  "name": "Done — Shared Lists",
+  "description": "Bidirectional shared to-do / shopping list",
+  "start_url": "./",
+  "display": "standalone",
+  "theme_color": "#0f172a",
+  "background_color": "#0f172a",
+  "icons": [
+    {
+      "src": "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 192 192'%3E%3Crect fill='%2322c55e' width='192' height='192' rx='48'/%3E%3Cpath fill='none' stroke='%23fff' stroke-width='14' stroke-linecap='round' stroke-linejoin='round' d='M60 96l24 24 48-48'/%3E%3C/svg%3E",
+      "sizes": "any",
+      "type": "image/svg+xml"
+    }
+  ]
+}
