@@ -120,10 +120,9 @@ function addItem(){
   const name=qItems.value.trim(); if(!name){ toast('Enter item name'); return; }
   const cat=(qCat.value.trim()||'Misc');
   const me = firebaseOK? uid : getOfflineUid();
-  const item = { id:'_'+Date.now()+Math.random().toString(36).slice(2,6), name, cat, done:false, createdAt:Date.now(), by:me, touched:Date.now() };
+  const item = { id:'_'+Date.now()+Math.random().toString(36).slice(2,6), name, cat, done:false, createdAt:Date.now(), by:me };
   const list = loadItems(); list.push(item); saveItems(list);
-  if(firebaseOK && uid){ const r=push(pathFor(uid)); update(r,{name,cat,done:false,createdAt:Date.now(),by:uid}); toast('Saved to cloud'); }
-  else { toast('Added (offline)'); }
+  toast(firebaseOK?'Saved to cloud':'Added (offline)');
   qItems.value=''; qCat.value=''; qItems.focus();
 }
 qAdd.onclick=addItem; qItems.onkeydown=e=>{ if(e.key==='Enter') addItem(); };
@@ -132,7 +131,7 @@ qCat.onkeydown=e=>{ if(e.key==='Enter') addItem(); };
 function toggleItem(it){
   if(firebaseOK && it.by===uid){ const target=ref(db,`dones/${it.by}/${it.id}`); update(target,{done:!it.done}); }
   else if(firebaseOK && it.by !== uid){ toast("Can only toggle your own items"); return; }
-  const list=loadItems().map(i=>i.id===it.id?{...i,done:!i.done, touched:Date.now()}:i);
+  const list=loadItems().map(i=>i.id===it.id?{...i,done:!i.done}:i);
   saveItems(list);
 }
 function deleteItem(it){

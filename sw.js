@@ -1,8 +1,7 @@
-const CACHE = 'done-v4';
+const CACHE = 'done-v2';
 const ASSETS = [
   './',
   './index.html',
-  './index.js',
   './manifest.json'
 ];
 self.addEventListener('install', e=>{
