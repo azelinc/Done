@@ -67,7 +67,7 @@
   <div class="small" style="margin-bottom:16px">Shared shopping lists</div>
   <div class="spinner"></div>
   <div class="small" style="margin-top:10px">Checking login…</div>
-  <div class="small" style="margin-top:4px">v21</div>
+  <div class="small" style="margin-top:4px">v22</div>
 </div>
 
 <!-- LOGIN PANEL (shown initially while Firebase resolves) -->
@@ -79,6 +79,7 @@
       <input type="email" id="login-email" placeholder="Email address" autocomplete="email">
       <input type="password" id="login-password" placeholder="Password (6+ chars)" autocomplete="current-password">
       <div class="error" id="login-error"></div>
+      <div id="module-status" style="font-size:11px;color:var(--muted);margin-top:6px">Loading…</div>
       <div class="login-actions">
         <button class="btn btn-primary" id="btn-login">Sign In</button>
         <button class="btn btn-ghost" id="btn-signup">Create Account</button>
@@ -130,7 +131,7 @@
     <button class="btn btn-ghost" id="btn-clear">Clear finished</button>
   </div>
 
-  <div class="footer">Press Enter to add — click circle to toggle · v21</div>
+  <div class="footer">Press Enter to add — click circle to toggle · v22</div>
 </div>
 
 <div id="toast" class="toast"></div>

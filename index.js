@@ -399,8 +399,13 @@ qLoginPass.onkeydown = e => { if (e.key === 'Enter') qBtnLogin.click(); };
 // ── Boot ──
 function esc(t) { const d = document.createElement('div'); d.textContent = t; return d.innerHTML; }
 
+// Signal that the JS module loaded
+var statusEl = el('module-status');
+if (statusEl) { statusEl.textContent = 'Module loaded'; statusEl.style.color = 'var(--accent)'; }
+
 if (firebaseOK) {
   onAuthStateChanged(auth, user => {
+    if (statusEl) { statusEl.textContent = user ? 'Signed in' : 'Ready — sign in'; }
     if (user) {
       showMain(user);
     } else {
