@@ -150,8 +150,6 @@ el('btn-link').onclick=()=>{
   qLinkPanel.style.display=qLinkPanel.style.display==='none'?'block':'none';
   updateHeader();
 };
-el('btn-settings').onclick=()=>el('link-panel').style.display=el('link-panel').style.display==='none'?'block':'none';
-
 function updateHeader(){
   qUidDisplay.textContent = firebaseOK ? uid : getOfflineUid();
   if(partnerUid){ qLinkedTo.textContent='Linked to: '+partnerUid.slice(0,8)+'…'; qUnlink.style.display=''; }
