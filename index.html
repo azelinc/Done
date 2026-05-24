@@ -62,16 +62,16 @@
 <body>
 
 <!-- LOADING (shown until auth resolves) -->
-<div class="app" id="loading-panel" style="max-width:300px;margin:40px auto;text-align:center">
+<div class="app hidden" id="loading-panel" style="max-width:300px;margin:40px auto;text-align:center">
   <h1 style="margin-bottom:2px;font-size:22px">Done</h1>
   <div class="small" style="margin-bottom:16px">Shared shopping lists</div>
   <div class="spinner"></div>
   <div class="small" style="margin-top:10px">Checking login…</div>
-  <div class="small" style="margin-top:4px">v19</div>
+  <div class="small" style="margin-top:4px">v20</div>
 </div>
 
-<!-- LOGIN PANEL -->
-<div class="app hidden" id="login-panel" style="max-width:300px;margin:24px auto;text-align:center">
+<!-- LOGIN PANEL (shown initially while Firebase resolves) -->
+<div class="app" id="login-panel" style="max-width:300px;margin:24px auto;text-align:center">
   <h1 style="margin-bottom:2px;font-size:22px">Done</h1>
   <div class="small" style="margin-bottom:16px">Shared shopping lists, synced across devices</div>
   <div class="card">
@@ -130,13 +130,22 @@
     <button class="btn btn-ghost" id="btn-clear">Clear finished</button>
   </div>
 
-  <div class="footer">Press Enter to add — click circle to toggle · v19</div>
+  <div class="footer">Press Enter to add — click circle to toggle · v20</div>
 </div>
 
 <div id="toast" class="toast"></div>
 
 <script type="module" src="index.js"></script>
 <script>
+// Safety net: if JS module fails to load, show login after 8s
+setTimeout(function(){
+  var spin = document.getElementById('loading-panel');
+  if (spin && !spin.classList.contains('hidden')) {
+    spin.classList.add('hidden');
+    var login = document.getElementById('login-panel');
+    if (login) login.classList.remove('hidden');
+  }
+}, 8000);
 if('serviceWorker' in navigator){
   navigator.serviceWorker.register('sw.js')
     .then(r=>console.log('SW registered',r.scope))

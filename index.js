@@ -339,15 +339,7 @@ qLogout.onclick = () => {
 };
 
 // ── Auth handlers ──
-const qLoading = el('loading-panel');
-
-function showLogin() {
-  qLoading.classList.add('hidden');
-  qLoginPanel.classList.remove('hidden');
-  qMainPanel.classList.add('hidden');
-}
 function showMain(user) {
-  qLoading.classList.add('hidden');
   qLoginPanel.classList.add('hidden');
   qMainPanel.classList.remove('hidden');
   uid = user.uid;
@@ -405,14 +397,11 @@ function esc(t) { const d = document.createElement('div'); d.textContent = t; re
 
 if (firebaseOK) {
   onAuthStateChanged(auth, user => {
-    qLoading.classList.add('hidden');
     if (user) {
       showMain(user);
-    } else {
-      showLogin();
     }
+    // else: login panel already visible, user signs in
   });
 } else {
-  showLogin();
   qLoginPanel.innerHTML = '<h1>Done</h1><div class="card">Cloud sync unavailable. Refresh to retry.</div>';
 }
